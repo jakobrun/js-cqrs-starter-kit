@@ -1,0 +1,20 @@
+{
+  "name": "js-cqrs-starter-kit",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jakobrun/js-cqrs-starter-kit.git"
+  },
+  "author": "Jakob Már Rúnarsson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jakobrun/js-cqrs-starter-kit/issues"
+  },
+  "homepage": "https://github.com/jakobrun/js-cqrs-starter-kit",
+  "keywords": [],
+  "description": ""
+}
