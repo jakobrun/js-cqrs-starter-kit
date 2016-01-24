@@ -1,12 +1,16 @@
 'use strict';
 const {expect} = require('chai');
+const createTabAggregate = require('../cafe/tab_aggregate')
 
-function given(events) {
+function given(...givenEvents) {
+    const tabAgg = createTabAggregate();
+    givenEvents.forEach(tabAgg.apply);
     return {
-        when: function(commands) {
+        when: function(command) {
+            const events = tabAgg[command.type](command);
             return {
-                then: function(expectedEvents) {
-                    
+                then: function(...expectedEvents) {
+                    expect(events).to.eql(expectedEvents);
                 }
             };
         }
@@ -16,9 +20,5 @@ function given(events) {
 function when(command) {
 
 }
-
-function then(events) {
-}
-
 
 module.exports = {given};
