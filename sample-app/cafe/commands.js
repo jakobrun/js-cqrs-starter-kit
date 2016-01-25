@@ -7,5 +7,11 @@ module.exports = {
             tableNumber: options.tableNumber,
             waiter: options.waiter
         };
+    },
+    placeOrder: function(options) {
+        return {
+            type: 'placeOrder',
+            items: options.items
+        };
     }
 };

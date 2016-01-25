@@ -1,18 +1,34 @@
 'use strict';
 const {given} = require('./bdd');
-const {openTab} = require('../cafe/commands');
+const {openTab, placeOrder} = require('../cafe/commands');
 const {tabOpened} = require('../cafe/events');
 const testTable = 42;
-const testWatier = 'Derek';
+const testWaiter = 'Derek';
+
+function createTestDrink1() {
+    return {
+        menuNumber: 4,
+        description: 'Sprite',
+        price: 1.5,
+        type: 'drink'
+    };
+}
 
 describe('tab', function() {
     it('should open a new tab', function() {
-        given().when(openTab({
+        const openTabCommand = openTab({
             tableNumber: testTable,
-            waiter: testWatier
-        })).then(tabOpened({
+            waiter: testWaiter
+        });
+        given().when(openTabCommand).then(tabOpened({
             tableNumber: testTable,
-            waiter: testWatier
+            waiter: testWaiter
         }));
     });
+
+    it('should not order with unopened tab', function() {
+        given().when(placeOrder({
+            items: [createTestDrink1()]
+        })).thenFailWith('TabNotOpen');
+    })
 });

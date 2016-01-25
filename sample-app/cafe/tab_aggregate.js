@@ -8,6 +8,9 @@ module.exports = function createTabAggregate() {
         },
         openTab: function(command) {
             return [tabOpened(command)];
+        },
+        placeOrder: function(command) {
+            throw new Error('TabNotOpen');
         }
     }
 };

@@ -7,10 +7,19 @@ function given(...givenEvents) {
     givenEvents.forEach(tabAgg.apply);
     return {
         when: function(command) {
-            const events = tabAgg[command.type](command);
+            const res = (function(){
+                try {
+                    return tabAgg[command.type](command);
+                } catch(ex) {
+                    return ex.message;
+                }
+            }());
             return {
                 then: function(...expectedEvents) {
-                    expect(events).to.eql(expectedEvents);
+                    expect(res).to.eql(expectedEvents);
+                },
+                thenFailWith: function(errMessage) {
+                    expect(res).to.equal(errMessage);
                 }
             };
         }
