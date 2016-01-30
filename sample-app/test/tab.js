@@ -1,7 +1,7 @@
 'use strict';
 const {given} = require('./bdd');
 const {openTab, placeOrder} = require('../cafe/commands');
-const {tabOpened} = require('../cafe/events');
+const {tabOpened, drinksOrdered} = require('../cafe/events');
 const testTable = 42;
 const testWaiter = 'Derek';
 
@@ -30,5 +30,16 @@ describe('tab', function() {
         given().when(placeOrder({
             items: [createTestDrink1()]
         })).thenFailWith('TabNotOpen');
-    })
+    });
+
+    it('should place drinks order', function() {
+        given(tabOpened({
+            tableNumber: testTable,
+            waiter: testWaiter
+        })).when(placeOrder({
+            items: [createTestDrink1()]
+        })).then(drinksOrdered({
+            items: [createTestDrink1()]
+        }))
+    });
 });

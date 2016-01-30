@@ -1,16 +1,25 @@
 'use strict';
-const {tabOpened} = require('./events');
+const assert = require('assert');
+const {tabOpened, drinksOrdered} = require('./events');
 
 module.exports = function createTabAggregate() {
-    return {
+    var open = false;
+    var tab = {
         apply: function(event) {
-
+            tab[event.type](event);
+        },
+        tabOpened: function(event) {
+            open = true;
         },
         openTab: function(command) {
             return [tabOpened(command)];
         },
         placeOrder: function(command) {
-            throw new Error('TabNotOpen');
+            assert(open, 'TabNotOpen');
+            return [drinksOrdered({
+                items: command.items
+            })];
         }
     }
+    return tab;
 };
