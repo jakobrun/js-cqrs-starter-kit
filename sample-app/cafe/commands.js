@@ -13,5 +13,11 @@ module.exports = {
             type: 'placeOrder',
             items: options.items
         };
+    },
+    markDrinksServed: function(options) {
+        return {
+            type: 'markDrinksServed',
+            menuNumbers: options.menuNumbers
+        }
     }
 };

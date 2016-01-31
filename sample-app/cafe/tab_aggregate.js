@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('assert');
-const {tabOpened, drinksOrdered, foodOrdered} = require('./events');
+const {tabOpened, drinksOrdered, foodOrdered, drinksServed} = require('./events');
 
 module.exports = function createTabAggregate() {
     var open = false;
@@ -10,6 +10,9 @@ module.exports = function createTabAggregate() {
         },
         tabOpened: function(event) {
             open = true;
+        },
+        drinksOrdered: function(event) {
+
         },
         openTab: function(command) {
             return [tabOpened(command)];
@@ -26,6 +29,11 @@ module.exports = function createTabAggregate() {
                 events.push(foodOrdered({items: foods}));
             }
             return events;
+        },
+        markDrinksServed: function(command) {
+            return [drinksServed({
+                menuNumbers: command.menuNumbers
+            })];
         }
     }
     return tab;

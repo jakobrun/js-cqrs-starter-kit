@@ -19,5 +19,11 @@ module.exports = {
             type: 'foodOrdered',
             items: options.items
         }
+    },
+    drinksServed: function(options) {
+        return {
+            type: 'drinksServed',
+            menuNumbers: options.menuNumbers
+        }
     }
 }

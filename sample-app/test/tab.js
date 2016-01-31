@@ -1,7 +1,7 @@
 'use strict';
 const {given} = require('./bdd');
-const {openTab, placeOrder} = require('../cafe/commands');
-const {tabOpened, drinksOrdered, foodOrdered} = require('../cafe/events');
+const {openTab, placeOrder, markDrinksServed} = require('../cafe/commands');
+const {tabOpened, drinksOrdered, foodOrdered, drinksServed} = require('../cafe/events');
 const testTable = 42;
 const testWaiter = 'Derek';
 
@@ -10,6 +10,15 @@ function createTestDrink1() {
         menuNumber: 4,
         description: 'Sprite',
         price: 1.5,
+        type: 'drink'
+    };
+}
+
+function createTestDrink2() {
+    return {
+        menuNumber: 10,
+        description: 'Beer',
+        price: 2.5,
         type: 'drink'
     };
 }
@@ -73,6 +82,21 @@ describe('tab', function() {
             items: [createTestDrink1()]
         }), foodOrdered({
             items: [createTestFood1()]
+        }));
+    });
+
+    it('should serve ordered drinks', function() {
+        const drink1 = createTestDrink1(),
+            drink2 = createTestDrink2();
+        given(tabOpened({
+            tableNumber: testTable,
+            waiter: testWaiter
+        }), drinksOrdered({
+            items: [drink1, drink2]
+        })).when(markDrinksServed({
+            menuNumbers: [drink1.menuNumber, drink2.menuNumber]
+        })).then(drinksServed({
+            menuNumbers: [drink1.menuNumber, drink2.menuNumber]
         }))
-    })
+    });
 });
