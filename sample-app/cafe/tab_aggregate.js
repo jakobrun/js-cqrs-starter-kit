@@ -1,9 +1,9 @@
 'use strict';
 const assert = require('assert');
-const {tabOpened, drinksOrdered, foodOrdered, drinksServed, foodPrepared, foodServed} = require('./events');
+const {tabOpened, drinksOrdered, foodOrdered, drinksServed, foodPrepared, foodServed, tabClosed} = require('./events');
 
 module.exports = function createTabAggregate() {
-    var open = false;
+    var open = false, servedItemsValue = 0;
     var outstandingDrinks = [], outstandingFood = [], preparedFood = [];
     const tab = {
         apply: function(event) {
@@ -14,9 +14,11 @@ module.exports = function createTabAggregate() {
             open = true;
         },
         drinksOrdered: function(event) {
+            servedItemsValue += event.items.reduce((value, item) => value + item.price, 0);
             outstandingDrinks = outstandingDrinks.concat(event.items.map(i => i.menuNumber));
         },
         foodOrdered: function(event) {
+            servedItemsValue += event.items.reduce((value, item) => value + item.price, 0);
             outstandingFood = outstandingFood.concat(event.items.map(i => i.menuNumber));
         },
         drinksServed: function(event) {
@@ -31,6 +33,9 @@ module.exports = function createTabAggregate() {
         foodServed: function(event) {
             preparedFood = preparedFood
                 .filter(foodMenuNumber => event.menuNumbers.indexOf(foodMenuNumber) === -1);
+        },
+        tabClosed: function(event) {
+            open = false;
         },
         openTab: function(command) {
             return [tabOpened(command)];
@@ -73,6 +78,16 @@ module.exports = function createTabAggregate() {
             assert(isFoodPrepared(), 'FoodNotPrepared');
             return [foodServed({
                 menuNumbers: command.menuNumbers
+            })];
+        },
+        closeTab: function(command) {
+            assert(open, 'TabNotOpen');
+            assert(!outstandingDrinks.length && !outstandingFood.length && !preparedFood.length, 'TabHasUnservedItems');
+            assert(command.amountPaid >= servedItemsValue, 'MustPayEnough');
+            return [tabClosed({
+                amountPaid: command.amountPaid,
+                orderValue: servedItemsValue,
+                tipValue: command.amountPaid - servedItemsValue
             })];
         }
     }

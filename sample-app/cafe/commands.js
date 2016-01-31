@@ -31,5 +31,11 @@ module.exports = {
             type: 'markFoodServed',
             menuNumbers: options.menuNumbers
         };
+    },
+    closeTab: function(options) {
+        return {
+            type: 'closeTab',
+            amountPaid: options.amountPaid
+        };
     }
 };

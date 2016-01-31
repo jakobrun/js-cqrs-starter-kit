@@ -1,7 +1,7 @@
 'use strict';
 const {given} = require('./bdd');
-const {openTab, placeOrder, markDrinksServed, markFoodPrepared, markFoodServed} = require('../cafe/commands');
-const {tabOpened, drinksOrdered, foodOrdered, drinksServed, foodPrepared, foodServed} = require('../cafe/events');
+const {openTab, placeOrder, markDrinksServed, markFoodPrepared, markFoodServed, closeTab} = require('../cafe/commands');
+const {tabOpened, drinksOrdered, foodOrdered, drinksServed, foodPrepared, foodServed, tabClosed} = require('../cafe/events');
 const testTable = 42;
 const testWaiter = 'Derek';
 
@@ -191,5 +191,93 @@ describe('tab', function() {
         })).when(markFoodServed({
             menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
         })).thenFailWith('FoodNotPrepared');
+    });
+
+    it('should close tab with exact amount', function() {
+        const testFood1 = createTestFood1(),
+            testFood2 = createTestFood2();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood2]
+        }), foodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        }), foodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).when(closeTab({
+            amountPaid: testFood1.price + testFood2.price
+        })).then(tabClosed({
+            amountPaid: testFood1.price + testFood2.price,
+            orderValue: testFood1.price + testFood2.price,
+            tipValue: 0.0
+        }));
+    });
+
+    it('should close tab with tip', function() {
+        const testDrink2 = createTestDrink2();
+        given(testTabOpened(), drinksOrdered({
+            items: [testDrink2]
+        }), drinksServed({
+            menuNumbers: [testDrink2.menuNumber]
+        })).when(closeTab({
+            amountPaid: testDrink2.price + 0.5
+        })).then(tabClosed({
+            amountPaid: testDrink2.price + 0.5,
+            orderValue: testDrink2.price,
+            tipValue: 0.5
+        }));
+    });
+
+    it('should pay enough to close tab', function() {
+        const testDrink2 = createTestDrink2();
+        given(testTabOpened(), drinksOrdered({
+            items: [testDrink2]
+        }), drinksServed({
+            menuNumbers: [testDrink2.menuNumber]
+        })).when(closeTab({
+            amountPaid: testDrink2.price - 0.5
+        })).thenFailWith('MustPayEnough')
+    });
+
+    it('should not close tab twice', function() {
+        const testDrink2 = createTestDrink2();
+        given(testTabOpened(), drinksOrdered({
+            items: [testDrink2]
+        }), drinksServed({
+            menuNumbers: [testDrink2.menuNumber]
+        }), tabClosed({
+            amountPaid: testDrink2.price + 0.5,
+            orderValue: testDrink2.price,
+            tipValue: 0.5
+        })).when(closeTab({
+            amountPaid: testDrink2.price + 0.5
+        })).thenFailWith('TabNotOpen');
+    });
+
+    it('should not close tab with unserved drinks', function() {
+        const testDrink2 = createTestDrink2();
+        given(testTabOpened(), drinksOrdered({
+            items: [testDrink2]
+        })).when(closeTab({
+            amountPaid: testDrink2.price
+        })).thenFailWith('TabHasUnservedItems');
+    });
+
+    it('should not close tab with unprepared food', function() {
+        const testFood1 = createTestFood1();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1]
+        })).when(closeTab({
+            amountPaid: testFood1.price
+        })).thenFailWith('TabHasUnservedItems');
+    });
+
+    it('should not close tab with unserved food', function() {
+        const testFood1 = createTestFood1();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1]
+        }), foodPrepared({
+            menuNumbers: [testFood1.menuNumber]
+        })).when(closeTab({
+            amountPaid: testFood1.price
+        })).thenFailWith('TabHasUnservedItems');
     });
 });

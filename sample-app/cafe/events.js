@@ -37,5 +37,13 @@ module.exports = {
             type: 'foodServed',
             menuNumbers: options.menuNumbers
         };
+    },
+    tabClosed: function(options) {
+        return {
+            type: 'tabClosed',
+            amountPaid: options.amountPaid,
+            orderValue: options.orderValue,
+            tipValue: options.tipValue
+        };
     }
 }
