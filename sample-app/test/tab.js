@@ -62,4 +62,17 @@ describe('tab', function() {
             items: [createTestFood1(), createTestFood1()]
         }));
     });
+
+    it('should place food and drink order', function() {
+        given(tabOpened({
+            tableNumber: testTable,
+            waiter: testWaiter
+        })).when(placeOrder({
+            items: [createTestFood1(), createTestDrink1()]
+        })).then(drinksOrdered({
+            items: [createTestDrink1()]
+        }), foodOrdered({
+            items: [createTestFood1()]
+        }))
+    })
 });
