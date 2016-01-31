@@ -110,4 +110,19 @@ describe('tab', function() {
             menuNumbers: [createTestDrink2()]
         })).thenFailWith('DrinksNotOutstanding');
     });
+
+    it('should not serve an ordered drink twice', function() {
+        const testDrink1 = createTestDrink1();
+        given(tabOpened({
+            tableNumber: testTable,
+            waiter: testWaiter
+        }), drinksOrdered({
+            items: [testDrink1]
+        }), drinksServed({
+            menuNumbers: [testDrink1.menuNumber]
+        })).when(markDrinksServed({
+            menuNumbers: [testDrink1.menuNumber]
+        })).thenFailWith('DrinksNotOutstanding');
+
+    });
 });

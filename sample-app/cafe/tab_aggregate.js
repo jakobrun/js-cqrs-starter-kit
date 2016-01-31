@@ -15,6 +15,9 @@ module.exports = function createTabAggregate() {
         drinksOrdered: function(event) {
             outstandingDrinks = outstandingDrinks.concat(event.items.map(i => i.menuNumber));
         },
+        drinksServed: function(event) {
+            outstandingDrinks = outstandingDrinks.filter(drinkMenuNumber => event.menuNumbers.indexOf(drinkMenuNumber) === -1);
+        },
         openTab: function(command) {
             return [tabOpened(command)];
         },
