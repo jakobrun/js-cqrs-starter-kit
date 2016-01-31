@@ -32,16 +32,18 @@ function createTestFood1() {
     };
 }
 
+const testTabOpened = () => tabOpened({
+    tableNumber: testTable,
+    waiter: testWaiter
+});
+
 describe('tab', function() {
     it('should open a new tab', function() {
         const openTabCommand = openTab({
             tableNumber: testTable,
             waiter: testWaiter
         });
-        given().when(openTabCommand).then(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        }));
+        given().when(openTabCommand).then(testTabOpened());
     });
 
     it('should not order with unopened tab', function() {
@@ -51,10 +53,7 @@ describe('tab', function() {
     });
 
     it('should place drinks order', function() {
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        })).when(placeOrder({
+        given(testTabOpened()).when(placeOrder({
             items: [createTestDrink1()]
         })).then(drinksOrdered({
             items: [createTestDrink1()]
@@ -62,10 +61,7 @@ describe('tab', function() {
     });
 
     it('should place food order', function() {
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        })).when(placeOrder({
+        given(testTabOpened()).when(placeOrder({
             items: [createTestFood1(), createTestFood1()]
         })).then(foodOrdered({
             items: [createTestFood1(), createTestFood1()]
@@ -73,10 +69,7 @@ describe('tab', function() {
     });
 
     it('should place food and drink order', function() {
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        })).when(placeOrder({
+        given(testTabOpened()).when(placeOrder({
             items: [createTestFood1(), createTestDrink1()]
         })).then(drinksOrdered({
             items: [createTestDrink1()]
@@ -88,10 +81,7 @@ describe('tab', function() {
     it('should serve ordered drinks', function() {
         const drink1 = createTestDrink1(),
             drink2 = createTestDrink2();
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        }), drinksOrdered({
+        given(testTabOpened(), drinksOrdered({
             items: [drink1, drink2]
         })).when(markDrinksServed({
             menuNumbers: [drink1.menuNumber, drink2.menuNumber]
@@ -101,10 +91,7 @@ describe('tab', function() {
     });
 
     it('should not serve unordered drink', function() {
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        }), drinksOrdered({
+        given(testTabOpened(), drinksOrdered({
             items: [createTestDrink1()]
         })).when(markDrinksServed({
             menuNumbers: [createTestDrink2()]
@@ -113,10 +100,7 @@ describe('tab', function() {
 
     it('should not serve an ordered drink twice', function() {
         const testDrink1 = createTestDrink1();
-        given(tabOpened({
-            tableNumber: testTable,
-            waiter: testWaiter
-        }), drinksOrdered({
+        given(testTabOpened(), drinksOrdered({
             items: [testDrink1]
         }), drinksServed({
             menuNumbers: [testDrink1.menuNumber]
