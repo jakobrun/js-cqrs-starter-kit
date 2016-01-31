@@ -1,10 +1,10 @@
 'use strict';
 const assert = require('assert');
-const {tabOpened, drinksOrdered} = require('./events');
+const {tabOpened, drinksOrdered, foodOrdered} = require('./events');
 
 module.exports = function createTabAggregate() {
     var open = false;
-    var tab = {
+    const tab = {
         apply: function(event) {
             tab[event.type](event);
         },
@@ -16,9 +16,16 @@ module.exports = function createTabAggregate() {
         },
         placeOrder: function(command) {
             assert(open, 'TabNotOpen');
-            return [drinksOrdered({
-                items: command.items
-            })];
+            const drinks = command.items.filter(item => item.type === 'drink');
+            const foods = command.items.filter(item => item.type === 'food');
+            const events = [];
+            if(drinks.length) {
+                events.push(drinksOrdered({items: drinks}));
+            }
+            if(foods.length) {
+                events.push(foodOrdered({items: foods}));
+            }
+            return events;
         }
     }
     return tab;
