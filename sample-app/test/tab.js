@@ -1,7 +1,7 @@
 'use strict';
 const {given} = require('./bdd');
-const {openTab, placeOrder, markDrinksServed} = require('../cafe/commands');
-const {tabOpened, drinksOrdered, foodOrdered, drinksServed} = require('../cafe/events');
+const {openTab, placeOrder, markDrinksServed, markFoodPrepared, markFoodServed} = require('../cafe/commands');
+const {tabOpened, drinksOrdered, foodOrdered, drinksServed, foodPrepared, foodServed} = require('../cafe/events');
 const testTable = 42;
 const testWaiter = 'Derek';
 
@@ -28,6 +28,15 @@ function createTestFood1() {
         menuNumber: 16,
         description: 'Beef Noodles',
         price: 7.5,
+        type: 'food'
+    };
+}
+
+function createTestFood2() {
+    return {
+        menuNumber: 25,
+        description: 'Vegetable Curry',
+        price: 6.0,
         type: 'food'
     };
 }
@@ -107,6 +116,80 @@ describe('tab', function() {
         })).when(markDrinksServed({
             menuNumbers: [testDrink1.menuNumber]
         })).thenFailWith('DrinksNotOutstanding');
+    });
 
+    it('should mark food prepared', function() {
+        const testFood1 = createTestFood1();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood1]
+        })).when(markFoodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood1.menuNumber]
+        })).then(foodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood1.menuNumber]
+        }))
+    });
+
+    it('should not mark food prepared if it has not been ordered', function() {
+        given(testTabOpened()).when(markFoodPrepared({
+            menuNumbers: [createTestFood2()]
+        })).thenFailWith('FoodNotOutstanding');
+    });
+
+    it('should not mark food prepared twice', function() {
+        const testFood1 = createTestFood1();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood1]
+        }), foodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood1.menuNumber]
+        })).when(markFoodPrepared({
+            menuNumbers: [testFood1.menuNumber]
+        })).thenFailWith('FoodNotOutstanding');
+    });
+
+    it('should serve prepared food', function() {
+        const testFood1 = createTestFood1(),
+            testFood2 = createTestFood2();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood1]
+        }), foodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).when(markFoodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).then(foodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        }));
+    });
+
+    it('should not serve prepared food twice', function() {
+        const testFood1 = createTestFood1(),
+            testFood2 = createTestFood2();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood2]
+        }), foodPrepared({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        }), foodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).when(markFoodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).thenFailWith('FoodNotPrepared');
+
+    });
+
+    it('should not serve unordered food', function() {
+        given(testTabOpened(), foodOrdered({
+            items: [createTestFood1()]
+        })).when(markFoodServed({
+            menuNumbers: [createTestFood2().menuNumber]
+        })).thenFailWith('FoodNotPrepared');
+    });
+
+    it('should not serve ordered but unprepared food', function() {
+        const testFood1 = createTestFood1(),
+            testFood2 = createTestFood2();
+        given(testTabOpened(), foodOrdered({
+            items: [testFood1, testFood2]
+        })).when(markFoodServed({
+            menuNumbers: [testFood1.menuNumber, testFood2.menuNumber]
+        })).thenFailWith('FoodNotPrepared');
     });
 });

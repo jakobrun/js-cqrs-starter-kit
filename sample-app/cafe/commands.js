@@ -18,6 +18,18 @@ module.exports = {
         return {
             type: 'markDrinksServed',
             menuNumbers: options.menuNumbers
-        }
+        };
+    },
+    markFoodPrepared: function(options) {
+        return {
+            type: 'markFoodPrepared',
+            menuNumbers: options.menuNumbers
+        };
+    },
+    markFoodServed: function(options) {
+        return {
+            type: 'markFoodServed',
+            menuNumbers: options.menuNumbers
+        };
     }
 };
