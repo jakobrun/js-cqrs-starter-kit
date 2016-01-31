@@ -99,4 +99,15 @@ describe('tab', function() {
             menuNumbers: [drink1.menuNumber, drink2.menuNumber]
         }))
     });
+
+    it('should not serve unordered drink', function() {
+        given(tabOpened({
+            tableNumber: testTable,
+            waiter: testWaiter
+        }), drinksOrdered({
+            items: [createTestDrink1()]
+        })).when(markDrinksServed({
+            menuNumbers: [createTestDrink2()]
+        })).thenFailWith('DrinksNotOutstanding');
+    });
 });

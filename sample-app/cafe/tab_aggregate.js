@@ -4,6 +4,7 @@ const {tabOpened, drinksOrdered, foodOrdered, drinksServed} = require('./events'
 
 module.exports = function createTabAggregate() {
     var open = false;
+    var outstandingDrinks = [];
     const tab = {
         apply: function(event) {
             tab[event.type](event);
@@ -12,7 +13,7 @@ module.exports = function createTabAggregate() {
             open = true;
         },
         drinksOrdered: function(event) {
-
+            outstandingDrinks = outstandingDrinks.concat(event.items.map(i => i.menuNumber));
         },
         openTab: function(command) {
             return [tabOpened(command)];
@@ -31,6 +32,10 @@ module.exports = function createTabAggregate() {
             return events;
         },
         markDrinksServed: function(command) {
+            const areDrinksOutstanding = function () {
+                return command.menuNumbers.every(menuNumber => outstandingDrinks.indexOf(menuNumber) !== -1);
+            }
+            assert(areDrinksOutstanding(), 'DrinksNotOutstanding');
             return [drinksServed({
                 menuNumbers: command.menuNumbers
             })];
