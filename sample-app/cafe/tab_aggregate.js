@@ -46,10 +46,10 @@ module.exports = function createTabAggregate() {
             const foods = command.items.filter(item => item.type === 'food');
             const events = [];
             if(drinks.length) {
-                events.push(drinksOrdered({items: drinks}));
+                events.push(drinksOrdered({tabId: command.tabId, items: drinks}));
             }
             if(foods.length) {
-                events.push(foodOrdered({items: foods}));
+                events.push(foodOrdered({tabId: command.tabId, items: foods}));
             }
             return events;
         },
@@ -59,6 +59,7 @@ module.exports = function createTabAggregate() {
             };
             assert(areDrinksOutstanding(), 'DrinksNotOutstanding');
             return [drinksServed({
+                tabId: command.tabId,
                 menuNumbers: command.menuNumbers
             })];
         },
@@ -68,6 +69,7 @@ module.exports = function createTabAggregate() {
             };
             assert(isFoodOutstanding(), 'FoodNotOutstanding');
             return [foodPrepared({
+                tabId: command.tabId,
                 menuNumbers: command.menuNumbers
             })];
         },
@@ -77,6 +79,7 @@ module.exports = function createTabAggregate() {
             };
             assert(isFoodPrepared(), 'FoodNotPrepared');
             return [foodServed({
+                tabId: command.tabId,
                 menuNumbers: command.menuNumbers
             })];
         },
@@ -85,6 +88,7 @@ module.exports = function createTabAggregate() {
             assert(!outstandingDrinks.length && !outstandingFood.length && !preparedFood.length, 'TabHasUnservedItems');
             assert(command.amountPaid >= servedItemsValue, 'MustPayEnough');
             return [tabClosed({
+                tabId: command.tabId,
                 amountPaid: command.amountPaid,
                 orderValue: servedItemsValue,
                 tipValue: command.amountPaid - servedItemsValue
