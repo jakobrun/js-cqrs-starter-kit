@@ -1,0 +1,17 @@
+{
+  "extends": "eslint:recommended",
+  "env": {
+    "node": true,
+    "browser": true,
+    "mocha": true,
+    "es6": true
+  },
+  "rules": {
+    "quotes": [2, "single", "avoid-escape"],
+    "no-console": 0,
+    "semi": [2, "always"],
+    "no-unused-vars": 2,
+    "consistent-return": 0,
+    "max-statements": [2, 12]
+  }
+}

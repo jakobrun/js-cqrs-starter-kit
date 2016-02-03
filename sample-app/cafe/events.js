@@ -53,4 +53,4 @@ module.exports = {
             tipValue: options.tipValue
         };
     }
-}
+};

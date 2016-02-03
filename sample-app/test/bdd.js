@@ -1,7 +1,6 @@
 'use strict';
 const {expect} = require('chai');
 const createTabAggregate = require('../cafe/tab_aggregate');
-const assert = require('assert');
 
 function given(...givenEvents) {
     const tabAgg = createTabAggregate();
@@ -25,10 +24,6 @@ function given(...givenEvents) {
             };
         }
     };
-}
-
-function when(command) {
-
 }
 
 module.exports = {given};

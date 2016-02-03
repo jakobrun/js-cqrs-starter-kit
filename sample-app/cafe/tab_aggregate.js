@@ -10,7 +10,7 @@ module.exports = function createTabAggregate() {
             assert(tab[event.type], 'missing event function of type: ' + event.type);
             tab[event.type](event);
         },
-        tabOpened: function(event) {
+        tabOpened: function() {
             open = true;
         },
         drinksOrdered: function(event) {
@@ -34,7 +34,7 @@ module.exports = function createTabAggregate() {
             preparedFood = preparedFood
                 .filter(foodMenuNumber => event.menuNumbers.indexOf(foodMenuNumber) === -1);
         },
-        tabClosed: function(event) {
+        tabClosed: function() {
             open = false;
         },
         openTab: function(command) {
@@ -94,6 +94,6 @@ module.exports = function createTabAggregate() {
                 tipValue: command.amountPaid - servedItemsValue
             })];
         }
-    }
+    };
     return tab;
 };
